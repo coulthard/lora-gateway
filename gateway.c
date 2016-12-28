@@ -402,17 +402,17 @@ setMode( int Channel, uint8_t newMode )
             writeRegister( Channel, REG_LNA, LNA_MAX_GAIN );    // MAX GAIN FOR RECEIVE
             writeRegister( Channel, REG_OPMODE, newMode );
             currentMode = newMode;
-            // LogMessage("Changing to Receive Continuous Mode\n");
+            LogMessage("Changing to Receive Continuous Mode\n");
             break;
         case RF98_MODE_SLEEP:
             writeRegister( Channel, REG_OPMODE, newMode );
             currentMode = newMode;
-            // LogMessage("Changing to Sleep Mode\n"); 
+            LogMessage("Changing to Sleep Mode\n"); 
             break;
         case RF98_MODE_STANDBY:
             writeRegister( Channel, REG_OPMODE, newMode );
             currentMode = newMode;
-            // LogMessage("Changing to Standby Mode\n");
+            LogMessage("Changing to Standby Mode\n");
             break;
         default:
             return;
@@ -426,7 +426,7 @@ setMode( int Channel, uint8_t newMode )
         // delay(1);
     }
 
-    // LogMessage("Mode Change Done\n");
+    LogMessage("Mode Change Done\n");
     return;
 }
 
@@ -448,7 +448,7 @@ void setFrequency( int Channel, double Frequency )
 
     Config.LoRaDevices[Channel].activeFreq = Frequency;
 
-    // LogMessage("Set Frequency to %lf\n", Frequency);
+    LogMessage("Set Frequency to %lf\n", Frequency);
 
     ChannelPrintf( Channel, 1, 1, "Channel %d %s MHz ", Channel, FrequencyString );
 }
@@ -467,13 +467,13 @@ void displayFrequency ( int Channel, double Frequency )
 
 void setLoRaMode( int Channel )
 {
-    // LogMessage("Setting LoRa Mode\n");
+    LogMessage("Setting LoRa Mode\n");
     setMode( Channel, RF98_MODE_SLEEP );
     writeRegister( Channel, REG_OPMODE, 0x80 );
 
     setMode( Channel, RF98_MODE_SLEEP );
 
-    // LogMessage("Set Default Frequency\n");
+    LogMessage("Set Default Frequency\n");
     setFrequency( Channel, Config.LoRaDevices[Channel].Frequency);
 }
 
@@ -568,7 +568,7 @@ void displayLoRaParameters( int Channel, int ImplicitOrExplicit, int ErrorCoding
 
 void SetDefaultLoRaParameters( int Channel )
 {
-    // LogMessage("Set Default Parameters\n");
+    LogMessage("Set Default Parameters\n");
 
     SetLoRaParameters( Channel,
                        Config.LoRaDevices[Channel].ImplicitOrExplicit,
@@ -682,7 +682,7 @@ void ShowPacketCounts(int Channel)
 
 void ProcessUploadMessage(int Channel, char *Message)
 {
-    // LogMessage("Ch %d: Uploaded message %s\n", Channel, Message);
+    LogMessage("Ch %d: Uploaded message %s\n", Channel, Message);
 }
 
 void ProcessCallingMessage(int Channel, char *Message)
@@ -1183,7 +1183,7 @@ void DIO0_Interrupt( int Channel )
     if ( Config.LoRaDevices[Channel].Sending )
     {
         Config.LoRaDevices[Channel].Sending = 0;
-        // LogMessage( "Ch%d: End of Tx\n", Channel );
+        LogMessage( "Ch%d: End of Tx\n", Channel );
 
         setLoRaMode( Channel );
         SetDefaultLoRaParameters( Channel );
@@ -1290,12 +1290,14 @@ void DIO_Ignore_Interrupt_0( void )
 void
 DIO0_Interrupt_0( void )
 {
+    LogMessage("In DIO0_Interrupt_0.\n");
     DIO0_Interrupt( 0 );
 }
 
 void
 DIO0_Interrupt_1( void )
 {
+    LogMessage("In DIO0_Interrupt_1.\n");
     DIO0_Interrupt( 1 );
 }
 
@@ -1303,12 +1305,25 @@ void setupRFM98( int Channel )
 {
     if ( Config.LoRaDevices[Channel].InUse )
     {
+        // Pull reset low (GPIO22 (wiring pin 3) (pin 15))
+        pinMode( 3, OUTPUT );
+        digitalWrite( 3, 0);
+        usleep( 100000 );
+        digitalWrite( 3, 1);
+        usleep( 100000 );
+        digitalWrite( 3, 0);
+	LogMessage("pulsed Wiring pin 3 high.\n");
+        
         // initialize the pins
         pinMode( Config.LoRaDevices[Channel].DIO0, INPUT );
         pinMode( Config.LoRaDevices[Channel].DIO5, INPUT );
 
-        wiringPiISR( Config.LoRaDevices[Channel].DIO0, INT_EDGE_RISING,
+        
+	wiringPiISR( Config.LoRaDevices[Channel].DIO0, INT_EDGE_RISING,
                      Channel > 0 ? &DIO0_Interrupt_1 : &DIO0_Interrupt_0 );
+
+	LogMessage("Setup DIO0 interupt for channel %d (pin %d).\n", Channel,
+	           Config.LoRaDevices[Channel].DIO0);
 
         if ( wiringPiSPISetup( Channel, 500000 ) < 0 )
         {
@@ -1352,7 +1367,7 @@ receiveMessage( int Channel, char *message )
     Bytes = 0;
 
     x = readRegister( Channel, REG_IRQ_FLAGS );
-    // LogMessage("Message status = %02Xh\n", x);
+    LogMessage("Message status = %02Xh\n", x);
 
     // clear the rxDone flag
     writeRegister( Channel, REG_IRQ_FLAGS, 0x40 );
@@ -2061,7 +2076,7 @@ rjh_post_message( int Channel, char *buffer )
     if ( Config.LoRaDevices[Channel].Sending )
     {
         Config.LoRaDevices[Channel].Sending = 0;
-        // LogMessage("Ch%d: End of Tx\n", Channel);
+        LogMessage("Ch%d: End of Tx\n", Channel);
 
         setLoRaMode( Channel );
         SetDefaultLoRaParameters( Channel );
@@ -2096,7 +2111,7 @@ rjh_post_message( int Channel, char *buffer )
             }
             else if ( Message[1] == '$' )
             {
-                //LogMessage("Ch %d: Uploaded message %s\n", Channel, Message+1);
+                LogMessage("Ch %d: Uploaded message %s\n", Channel, Message+1);
                 ProcessTelemetryMessage( Channel, Message + 1 );
             }
             else if ( Message[1] == '>' )
