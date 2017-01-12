@@ -35,6 +35,7 @@
 #include "config.h"
 #include "gui.h"
 #include "listener.h"
+#include "tft_display.h"
 
 #define VERSION	"V1.8.14"
 bool run = TRUE;
@@ -1305,14 +1306,16 @@ void setupRFM98( int Channel )
 {
     if ( Config.LoRaDevices[Channel].InUse )
     {
-        // Pull reset low (GPIO22 (wiring pin 3) (pin 15))
+
+    	// Pull reset low (GPIO22 (wiring pin 3) (pin 15))
         pinMode( 3, OUTPUT );
         digitalWrite( 3, 0);
         usleep( 100000 );
         digitalWrite( 3, 1);
         usleep( 100000 );
         digitalWrite( 3, 0);
-	LogMessage("pulsed Wiring pin 3 high.\n");
+        LogMessage("pulsed Wiring pin 3 high.\n");
+
         
         // initialize the pins
         pinMode( Config.LoRaDevices[Channel].DIO0, INPUT );
@@ -2190,6 +2193,7 @@ int main( int argc, char **argv )
     curl_global_init( CURL_GLOBAL_ALL );    // RJH thread safe
 
     mainwin = InitDisplay();
+    init_tft_display();
 
     // Settings for character input
     noecho(  );
