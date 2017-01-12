@@ -452,6 +452,8 @@ void setFrequency( int Channel, double Frequency )
     LogMessage("Set Frequency to %lf\n", Frequency);
 
     ChannelPrintf( Channel, 1, 1, "Channel %d %s MHz ", Channel, FrequencyString );
+    if (Channel == 0)
+    	tft_printf(0, 0, tft_white, 12, "Lora %.7s MHz ", FrequencyString );
 }
 
 void displayFrequency ( int Channel, double Frequency )
@@ -678,6 +680,23 @@ void ShowPacketCounts(int Channel)
         ChannelPrintf( Channel, 9, 1, "Bad CRC = %d Bad Type = %d",
                        Config.LoRaDevices[Channel].BadCRCCount,
                        Config.LoRaDevices[Channel].UnknownCount );
+
+        if (Channel == 0)
+        {
+			tft_printf(0, 16, tft_green, 12, "Telem:%d (%us) ",
+				Config.LoRaDevices[Channel].TelemetryCount,
+				Config.LoRaDevices[Channel].LastTelemetryPacketAt ? (unsigned int) (time(NULL) - Config.LoRaDevices[Channel].LastTelemetryPacketAt) : 0);
+	        tft_printf(0, 30, tft_green, 12, "Image:%d (%us) ",
+	                       Config.LoRaDevices[Channel].SSDVCount,
+	                       Config.LoRaDevices[Channel].
+	                       LastSSDVPacketAt ? ( unsigned int ) ( time( NULL ) -
+	                                                             Config.
+	                                                             LoRaDevices
+	                                                             [Channel].
+	                                                             LastSSDVPacketAt )
+	                       : 0 );
+        }
+
     }
 }
 
@@ -845,7 +864,16 @@ void ProcessLine(int Channel, char *Line)
     ChannelPrintf(Channel, 4, 1, "%8.5lf, %8.5lf, %05u   ",
                   Config.Payloads[PayloadIndex].Latitude,
                   Config.Payloads[PayloadIndex].Longitude,
-                  Config.Payloads[PayloadIndex].Altitude);	
+                  Config.Payloads[PayloadIndex].Altitude);
+    if (Channel == 0 && Config.Payloads[PayloadIndex].Altitude != 0)
+    {
+    	tft_printf(0, 50, tft_white, 18, "%8.5lf ",
+                Config.Payloads[PayloadIndex].Latitude);
+		tft_printf(0, 70, tft_white, 18, "%8.5lf ",
+                Config.Payloads[PayloadIndex].Longitude);
+    	tft_printf(0, 90, tft_white, 18, "%um ",
+                Config.Payloads[PayloadIndex].Altitude);
+    }
 }
 
 
