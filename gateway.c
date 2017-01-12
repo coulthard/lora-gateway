@@ -170,6 +170,7 @@ int LEDCounts[2];
 int help_win_displayed = 0;
 
 pthread_mutex_t var = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t spi_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 #pragma pack(1)
 
@@ -260,7 +261,9 @@ writeRegister( int Channel, uint8_t reg, uint8_t val )
 
     data[0] = reg | 0x80;
     data[1] = val;
+    pthread_mutex_lock( &spi_mutex );
     wiringPiSPIDataRW( Channel, data, 2 );
+    pthread_mutex_unlock( &spi_mutex);
 }
 
 uint8_t
@@ -271,7 +274,9 @@ readRegister( int Channel, uint8_t reg )
 
     data[0] = reg & 0x7F;
     data[1] = 0;
+    pthread_mutex_lock( &spi_mutex );
     wiringPiSPIDataRW( Channel, data, 2 );
+    pthread_mutex_unlock( &spi_mutex);
     val = data[1];
 
     return val;

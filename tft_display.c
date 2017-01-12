@@ -2,6 +2,7 @@
 #include <time.h>
 #include <SDL_ttf.h>
 #include <SDL2_gfxPrimitives.h>
+#include <pthread.h>
 
 #include "ili9163.h"
 #include "tft_display.h"
@@ -17,6 +18,9 @@ SDL_Color		tft_blue	= { 0, 0, 255};
 SDL_Color		tft_pink	= { 255, 0, 255};
 SDL_Color		tft_cyan	= { 0, 255, 255};
 SDL_Color		tft_black	= { 0, 0, 0};
+
+
+extern pthread_mutex_t spi_mutex;
 
 
 void init_tft_display()
@@ -35,7 +39,9 @@ void init_tft_display()
 	SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0xff, SDL_ALPHA_OPAQUE);
 	SDL_RenderClear(renderer);
 
+    pthread_mutex_lock( &spi_mutex);
 	blt_bitmap(surface->pixels);
+    pthread_mutex_unlock( &spi_mutex);
 }
 
 void tft_printf(int xc, int yc, SDL_Color col, int sz, char* format, ...)
@@ -60,13 +66,16 @@ void tft_printf(int xc, int yc, SDL_Color col, int sz, char* format, ...)
 	TTF_CloseFont(font);
 
 
-	static time_t last_reset = 0;
-	if (time(NULL) > last_reset + 10)
+    pthread_mutex_lock( &spi_mutex);
+/*
+    static time_t last_reset = 0;
+	if (time(NULL) > last_reset + 15)
 	{
 		last_reset = time(NULL);
 		init_display(ORIENTATION180);
 	}
-
+*/
 	blt_bitmap(surface->pixels);
+    pthread_mutex_unlock( &spi_mutex);
 }
 
