@@ -47,9 +47,9 @@ static void write_data(uint8_t data)
 void reset_LCD()
 {
     digitalWrite( RST_WIRING_PIN, 0);
-    usleep(20000);
+    usleep(1000);
     digitalWrite( RST_WIRING_PIN, 1);
-    usleep(20000);
+    usleep(1000);
 }
 
 
@@ -129,7 +129,7 @@ void init_display(uint8_t orientation)
     uint8_t data_vcom_ctl[]		= {0x50, 0x5b};
 
     write_command(EXIT_SLEEP_MODE);
-    usleep(50000);	// 50ms
+    usleep(5000);	// 5ms
     write_command(SET_PIXEL_FORMAT);
     write_data(0x05);
     write_command(SET_GAMMA_CURVE);
