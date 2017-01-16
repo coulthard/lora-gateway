@@ -1319,14 +1319,14 @@ void DIO_Ignore_Interrupt_0( void )
 void
 DIO0_Interrupt_0( void )
 {
-    LogMessage("In DIO0_Interrupt_0.\n");
+    //LogMessage("In DIO0_Interrupt_0.\n");
     DIO0_Interrupt( 0 );
 }
 
 void
 DIO0_Interrupt_1( void )
 {
-    LogMessage("In DIO0_Interrupt_1.\n");
+    //LogMessage("In DIO0_Interrupt_1.\n");
     DIO0_Interrupt( 1 );
 }
 
@@ -1419,7 +1419,9 @@ receiveMessage( int Channel, char *message )
         currentAddr = readRegister( Channel, REG_FIFO_RX_CURRENT_ADDR );
         Bytes = readRegister( Channel, REG_RX_NB_BYTES );
 
-        ChannelPrintf( Channel, 10, 1, "Packet SNR = %d, RSSI = %d      ", PacketSNR(Channel), PacketRSSI(Channel));
+        int snr = PacketSNR(Channel), rssi = PacketRSSI(Channel);
+        ChannelPrintf( Channel, 10, 1, "Packet SNR = %d, RSSI = %d      ", snr, rssi);
+        tft_printf(0, 110, tft_yellow, 12, "SNR:%d rssi:%d ", snr, rssi );
 
         FreqError = FrequencyError( Channel ) / 1000;
         ChannelPrintf( Channel, 11, 1, "Freq. Error = %5.1lfkHz ", FreqError);
@@ -2424,7 +2426,10 @@ int main( int argc, char **argv )
                 {
                     ShowPacketCounts( Channel );
 
-                    ChannelPrintf( Channel, 12, 1, "Current RSSI = %4d   ", CurrentRSSI(Channel));
+                    int rssi = CurrentRSSI(Channel);
+                    ChannelPrintf( Channel, 12, 1, "Current RSSI = %4d   ", rssi);
+                	//tft_printf(50, 110, tft_yellow, 12, "rssi:%4d ", rssi );
+
 
 					// Calling mode timeout?
                     if ( Config.LoRaDevices[Channel].InCallingMode
