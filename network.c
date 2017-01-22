@@ -21,6 +21,7 @@
 #include <wiringPi.h>           // Include WiringPi library!
 #include "network.h"
 #include "global.h"
+#include "tft_display.h"
 
 int
 HaveAnIPAddress( void )
@@ -95,23 +96,31 @@ NetworkLoop( void *some_void_ptr )
     {
         if ( HaveAnIPAddress(  ) )
         {
-            digitalWrite( Config.NetworkLED, 1 );
+        	if ( Config.NetworkLED >= 0 )
+        		digitalWrite( Config.NetworkLED, 1 );
+            ui_set_network_flag(1);
 //          LogMessage("On network :-)\n");
 
             if ( CanSeeTheInternet(  ) )
             {
-                digitalWrite( Config.InternetLED, 1 );
+            	if ( Config.InternetLED >= 0 )
+            		digitalWrite( Config.InternetLED, 1 );
+                ui_set_internet_flag(1);
 //              LogMessage("On the internet :-)\n");
             }
             else
             {
-                digitalWrite( Config.InternetLED, 0 );
+            	if ( Config.InternetLED >= 0 )
+                	digitalWrite( Config.InternetLED, 0 );
+                ui_set_internet_flag(0);
 //              LogMessage("Not on internet :-(\n");
             }
         }
         else
         {
-            digitalWrite( Config.NetworkLED, 0 );
+        	if ( Config.NetworkLED >= 0 )
+        		digitalWrite( Config.NetworkLED, 0 );
+            ui_set_network_flag(0);
 //          LogMessage("No network :-(\n");
         }
 

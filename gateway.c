@@ -458,7 +458,7 @@ void setFrequency( int Channel, double Frequency )
 
     ChannelPrintf( Channel, 1, 1, "Channel %d %s MHz ", Channel, FrequencyString );
     if (Channel == 0)
-    	tft_printf(0, 0, tft_white, 12, "Lora %.7s MHz ", FrequencyString );
+    	ui_set_freq(Frequency);
 }
 
 void displayFrequency ( int Channel, double Frequency )
@@ -687,20 +687,10 @@ void ShowPacketCounts(int Channel)
                        Config.LoRaDevices[Channel].UnknownCount );
 
         if (Channel == 0)
-        {
-			tft_printf(0, 16, tft_green, 12, "Telem:%d (%us) ",
-				Config.LoRaDevices[Channel].TelemetryCount,
-				Config.LoRaDevices[Channel].LastTelemetryPacketAt ? (unsigned int) (time(NULL) - Config.LoRaDevices[Channel].LastTelemetryPacketAt) : 0);
-	        tft_printf(0, 30, tft_green, 12, "Image:%d (%us) ",
-	                       Config.LoRaDevices[Channel].SSDVCount,
-	                       Config.LoRaDevices[Channel].
-	                       LastSSDVPacketAt ? ( unsigned int ) ( time( NULL ) -
-	                                                             Config.
-	                                                             LoRaDevices
-	                                                             [Channel].
-	                                                             LastSSDVPacketAt )
-	                       : 0 );
-        }
+        	ui_set_pkt_counts(Config.LoRaDevices[Channel].TelemetryCount,
+        			Config.LoRaDevices[Channel].LastTelemetryPacketAt,
+					Config.LoRaDevices[Channel].SSDVCount,
+					Config.LoRaDevices[Channel].LastSSDVPacketAt);
 
     }
 }
@@ -872,11 +862,9 @@ void ProcessLine(int Channel, char *Line)
                   Config.Payloads[PayloadIndex].Altitude);
     if (Channel == 0 && Config.Payloads[PayloadIndex].Altitude != 0)
     {
-    	tft_printf(0, 50, tft_white, 18, "%8.5lf ",
-                Config.Payloads[PayloadIndex].Latitude);
-		tft_printf(0, 70, tft_white, 18, "%8.5lf ",
-                Config.Payloads[PayloadIndex].Longitude);
-    	tft_printf(0, 90, tft_white, 18, "%um ",
+    	ui_set_gps_loc(
+                Config.Payloads[PayloadIndex].Latitude,
+                Config.Payloads[PayloadIndex].Longitude,
                 Config.Payloads[PayloadIndex].Altitude);
     }
 }
@@ -1239,6 +1227,7 @@ void DIO0_Interrupt( int Channel )
                 digitalWrite( Config.LoRaDevices[Channel].ActivityLED, 1 );
                 LEDCounts[Channel] = 5;
             }
+            ui_set_activity_flag(1);
 
             if ( Message[1] == '!' )
             {
@@ -1426,7 +1415,7 @@ receiveMessage( int Channel, char *message )
 
         int snr = PacketSNR(Channel), rssi = PacketRSSI(Channel);
         ChannelPrintf( Channel, 10, 1, "Packet SNR = %d, RSSI = %d      ", snr, rssi);
-        tft_printf(0, 110, tft_yellow, 12, "SNR:%d rssi:%d ", snr, rssi );
+        ui_set_rssi(snr, rssi);
 
         FreqError = FrequencyError( Channel ) / 1000;
         ChannelPrintf( Channel, 11, 1, "Freq. Error = %5.1lfkHz ", FreqError);
@@ -2138,6 +2127,7 @@ rjh_post_message( int Channel, char *buffer )
                 digitalWrite( Config.LoRaDevices[Channel].ActivityLED, 1 );
                 LEDCounts[Channel] = 5;
             }
+            ui_set_activity_flag(1);
 
             if ( Message[1] == '!' )
             {
@@ -2336,7 +2326,7 @@ int main( int argc, char **argv )
         }
     }
 
-    if ( ( Config.NetworkLED >= 0 ) && ( Config.InternetLED >= 0 ) )
+    //if ( ( Config.NetworkLED >= 0 ) && ( Config.InternetLED >= 0 ) )
     {
         if ( pthread_create( &NetworkThread, NULL, NetworkLoop, NULL ) )
         {
@@ -2485,12 +2475,13 @@ int main( int argc, char **argv )
                     }
 
 					// LEDs
-                    if (LEDCounts[Channel] && ( Config.LoRaDevices[Channel].ActivityLED >= 0))
+                    if (LEDCounts[Channel] && (--LEDCounts[Channel] == 0))
                     {
-                        if ( --LEDCounts[Channel] == 0 )
+                        if (Config.LoRaDevices[Channel].ActivityLED >= 0)
                         {
                             digitalWrite(Config.LoRaDevices[Channel].ActivityLED, 0);
                         }
+                        ui_set_activity_flag(0);
                     }
                 }
             }

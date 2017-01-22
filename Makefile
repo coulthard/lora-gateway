@@ -8,8 +8,8 @@ EXE=gateway
 INDOPT= -bap -bl -blf -bli0 -brs -cbi0 -cdw -cs -ci4 -cli4 -i4 -ip0 -nbc -nce -lp -npcs -nut -pmt -psl -prs -ts4
 
 CC=gcc
-CFLAGS=-Wall -O3 -g  -I/usr/include/SDL2 #-std=c99 
-LDFLAGS= -lm -lwiringPi -lwiringPiDev -lcurl -lncurses -lpthread -lSDL2 -lSDL2_ttf -lSDL2_gfx
+CFLAGS=-Wall -O0 -g  -I/usr/include/SDL2 #-std=c99 
+LDFLAGS= -lSDL2 -lSDL2_ttf -lSDL2_gfx -lm -lwiringPi -lwiringPiDev -lcurl -lncurses -lpthread
 RM=rm
 
 %.o: %.c *.h     # combined w/ next line will compile recently changed .c files
