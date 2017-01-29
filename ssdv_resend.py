@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import urllib.parse
 import urllib.request
 import json
@@ -5,6 +7,7 @@ from datetime import datetime, timedelta
 import sys
 import os.path
 import time
+
 
 def get_list_of_missing_packets(PayloadID, Minutes):
 	result = ''
