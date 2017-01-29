@@ -38,8 +38,8 @@ AFC_0=Y
 power_0=255
 DIO0_0=31
 DIO5_0=26
-UplinkTime_0=2
-UplinkCycle_0=60
+UplinkTime_0=1
+UplinkCycle_0=10
 
 
 ##### Config CE1 #####
