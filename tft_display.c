@@ -50,6 +50,14 @@ void init_tft_display()
 
 void ui_redraw()
 {
+	static time_t last_redraw = 0;
+	time_t now = time(NULL);
+
+	// limit redraws to one every 10 seconds.	
+	if (now <= last_redraw + 10)
+		return;
+	last_redraw = now;
+
 	SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0xff, SDL_ALPHA_OPAQUE);
 	SDL_RenderClear(renderer);
 
