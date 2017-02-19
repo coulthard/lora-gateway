@@ -88,7 +88,7 @@ while True:
 	if (datetime.utcnow().second < 0) or (datetime.utcnow().second > 50):
 		print("Checking ...")
 		# os.remove(folder + 'get_list.txt')
-		line = get_list_of_missing_packets(payload_id, 5)
+		line = get_list_of_missing_packets(payload_id, 15)
 		if len(line) <= 2:
 			print("No missing packets")
 		else:
