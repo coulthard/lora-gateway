@@ -1392,7 +1392,7 @@ receiveMessage( int Channel, char *message )
     Bytes = 0;
 
     x = readRegister( Channel, REG_IRQ_FLAGS );
-    LogMessage("Message status = %02Xh\n", x);
+    // LogMessage("Message status = %02Xh\n", x);
 
     // clear the rxDone flag
     writeRegister( Channel, REG_IRQ_FLAGS, 0x40 );
