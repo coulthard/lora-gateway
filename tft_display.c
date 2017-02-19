@@ -53,8 +53,8 @@ void ui_redraw()
 	static time_t last_redraw = 0;
 	time_t now = time(NULL);
 
-	// limit redraws to one every 10 seconds.	
-	if (now <= last_redraw + 10)
+	// limit redraws to one every 1 seconds.	
+	if (now <= last_redraw + 0)
 		return;
 	last_redraw = now;
 
@@ -73,6 +73,7 @@ void ui_redraw()
 	tft_printf(0, 50, tft_white, 18, "%8.5lf ", g_ui_state.latitude);
 	tft_printf(0, 70, tft_white, 18, "%8.5lf ", g_ui_state.longitude);
 	tft_printf(0, 90, tft_white, 15, "%um ", g_ui_state.altitude);
+	tft_printf(64, 90, tft_white, 15, "bad %u", g_ui_state.bad_pkts);
 
     tft_printf(0, 110, tft_yellow, 12, "SNR:%d rssi:%d ", g_ui_state.snr_ratio, g_ui_state.rssi );
 
@@ -107,20 +108,22 @@ void ui_redraw()
 void ui_set_freq(double f)
 {
 	g_ui_state.freq = f;
-	ui_redraw();
+	//ui_redraw();
 }
 
 void ui_set_pkt_counts(
 	int 	telem_pkts,
 	time_t	telem_time,
 	int		ssdv_pkts,
-	time_t	ssdv_time)
+	time_t	ssdv_time,
+	int		bad_pkts)
 {
 	g_ui_state.telem_pkts = telem_pkts;
 	g_ui_state.telem_time = telem_time;
 	g_ui_state.ssdv_pkts  = ssdv_pkts;
 	g_ui_state.ssdv_time  = ssdv_time;
-	ui_redraw();
+	g_ui_state.bad_pkts   = bad_pkts;
+	//ui_redraw();
 }
 
 void ui_set_gps_loc(
@@ -132,25 +135,25 @@ void ui_set_gps_loc(
 	g_ui_state.latitude  = latitude;
 	g_ui_state.altitude  = altitude;
 
-	ui_redraw();
+	//ui_redraw();
 }
 
 void ui_set_activity_flag(int activity_flag)
 {
 	g_ui_state.activity_flag = activity_flag;
-	ui_redraw();
+	//ui_redraw();
 }
 
 void ui_set_network_flag(int network_flag)
 {
 	g_ui_state.network_flag = network_flag;
-	ui_redraw();
+	//ui_redraw();
 }
 
 void ui_set_internet_flag(int internet_flag)
 {
 	g_ui_state.internet_flag = internet_flag;
-	ui_redraw();
+	//ui_redraw();
 }
 
 
@@ -159,8 +162,9 @@ void ui_set_rssi(int snr, int rssi)
 {
 	g_ui_state.snr_ratio = snr;
 	g_ui_state.rssi	     = rssi;
-
-	ui_redraw();
+	// Don't update screen here since it
+	// tends to cause conflicts with the SPI bus.
+	//ui_redraw();
 }
 
 

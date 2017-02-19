@@ -15,6 +15,7 @@
 #include <errno.h>
 #include <stdint.h>
 #include <stdarg.h> 
+#define __USE_GNU
 #include <pthread.h>
 #include <curses.h>
 #include <math.h>
@@ -170,8 +171,7 @@ int LEDCounts[2];
 int help_win_displayed = 0;
 
 pthread_mutex_t var = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t spi_mutex = PTHREAD_MUTEX_INITIALIZER;
-
+pthread_mutex_t spi_mutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
 #pragma pack(1)
 
 struct TBinaryPacket {
@@ -345,7 +345,7 @@ void LogMessage( const char *format, ... )
     va_list args;
     va_start( args, format );
 
-    vsprintf( Buffer, format, args );
+    vsnprintf( Buffer, sizeof(Buffer), format, args );
 
     va_end( args );
 
@@ -374,7 +374,7 @@ void ChannelPrintf(int Channel, int row, int column, const char *format, ... )
 
     va_start( args, format );
 
-    vsprintf( Buffer, format, args );
+    vsnprintf( Buffer, sizeof(Buffer), format, args );
 
     va_end( args );
 
@@ -442,7 +442,7 @@ void setFrequency( int Channel, double Frequency )
     char FrequencyString[10];
 
     // Format frequency as xxx.xxx.x Mhz
-    sprintf( FrequencyString, "%8.4lf ", Frequency );
+    snprintf( FrequencyString, sizeof(FrequencyString), "%8.4lf ", Frequency );
     FrequencyString[8] = FrequencyString[7];
     FrequencyString[7] = '.';
 
@@ -690,7 +690,9 @@ void ShowPacketCounts(int Channel)
         	ui_set_pkt_counts(Config.LoRaDevices[Channel].TelemetryCount,
         			Config.LoRaDevices[Channel].LastTelemetryPacketAt,
 					Config.LoRaDevices[Channel].SSDVCount,
-					Config.LoRaDevices[Channel].LastSSDVPacketAt);
+					Config.LoRaDevices[Channel].LastSSDVPacketAt,
+					Config.LoRaDevices[Channel].BadCRCCount + 
+					Config.LoRaDevices[Channel].UnknownCount);
 
     }
 }
@@ -1350,7 +1352,8 @@ void setupRFM98( int Channel )
 	LogMessage("Setup DIO0 interupt for channel %d (pin %d).\n", Channel,
 	           Config.LoRaDevices[Channel].DIO0);
 
-        if ( wiringPiSPISetup( Channel, 500000 ) < 0 )
+        //if ( wiringPiSPISetup( Channel, 500000 ) < 0 )
+        if ( wiringPiSPISetup( Channel, 32000000 ) < 0 )
         {
             exit_error("Failed to open SPI port.  Try loading spi library with 'gpio load spi'" );
         }
@@ -1391,6 +1394,9 @@ receiveMessage( int Channel, char *message )
 
     Bytes = 0;
 
+    //pthread_mutex_lock( &spi_mutex );
+
+	
     x = readRegister( Channel, REG_IRQ_FLAGS );
     // LogMessage("Message status = %02Xh\n", x);
 
@@ -1454,6 +1460,8 @@ receiveMessage( int Channel, char *message )
     // Clear all flags
     writeRegister( Channel, REG_IRQ_FLAGS, 0xFF );
 
+    //pthread_mutex_unlock( &spi_mutex);
+	
     return Bytes;
 }
 
@@ -2414,6 +2422,7 @@ int main( int argc, char **argv )
             tm = localtime( &now );
 
             LoopPeriod = 0;
+			ui_redraw();
 
             for (Channel=0; Channel<=1; Channel++)
             {
@@ -2423,7 +2432,6 @@ int main( int argc, char **argv )
 
                     int rssi = CurrentRSSI(Channel);
                     ChannelPrintf( Channel, 12, 1, "Current RSSI = %4d   ", rssi);
-                	//tft_printf(50, 110, tft_yellow, 12, "rssi:%4d ", rssi );
 
 
 					// Calling mode timeout?
