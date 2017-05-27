@@ -23,13 +23,30 @@ If you're making your own board for the Pi, connect the LoRa module(s) like so:
 	DIO5	Wiring Pi 26 (Pin 32) (Wiring Pi 5 (pin 18) for 2nd module)
 
 
+
+	TFT Screen (ili9163 or st7735)
+	TFT	 PI
+	----	 --
+	LED	GPIO23 (Pin 33) (Wiring Pi 23)
+	SCK	SPI_CLK (Pin 23) (Wiring Pi 14)
+	SDA	SPI_MOSI (Pin 19) (Wiring Pi 12)
+	A0	GPIO22 (Pin 31) (Wiring Pi 22) 
+	RESET	GPIO21 (Pin 29) (Wiring Pi 21)
+	CS	SPI_CE1_N (Pin 26) (Wiring Pi 11)
+	GND	Gnd (Pin 39)
+	VCC	3v3 (Pin 17 or Pin 1)
+
+
 Installation
 ============
 
 Enable SPI in raspi-config.
 
-Install the dependencies:
 
+Install TFT libraries:
+	sudo apt-get install libsdl2-dev libsdl2-ttf-dev libsdl2-gfx-dev
+
+Install the dependencies:
 	sudo apt-get install git wiringpi libcurl4-openssl-dev libncurses5-dev ssdv
 
 Install the LoRa gateway
