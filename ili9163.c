@@ -55,6 +55,10 @@ void reset_LCD()
 
 void set_frame(int x1, int y1, int x2, int y2)
 {
+	// For st7735 boards add an offset of 32 to y co-ords.
+	y1 += 32;
+	y2 += 32;
+
 	uint8_t data_xrange[4] = { x1 >> 8, x1 & 0xff, x2 >> 8, x2 & 0xff };
 	uint8_t data_yrange[4] = { y1 >> 8, y1 & 0xff, y2 >> 8, y2 & 0xff };
 	write_command(SET_COLUMN_ADDRESS);
