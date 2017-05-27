@@ -53,8 +53,10 @@ void ui_redraw()
 	static time_t last_redraw = 0;
 	time_t now = time(NULL);
 
+//return;
+
 	// limit redraws to one every 1 seconds.	
-	if (now <= last_redraw + 0)
+	if (now <= last_redraw + 1)
 		return;
 	last_redraw = now;
 
