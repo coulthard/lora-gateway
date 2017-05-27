@@ -10,7 +10,7 @@ Antenna=81mm of wire
 ##### Config Options #####
 
 EnableHabitat=Y
-EnableSSDV=Y
+EnableSSDV=N
 JPGFolder=ssdv
 LogTelemetry=Y
 LogPackets=Y
@@ -27,7 +27,8 @@ ActivityLED_0=4
 ##### Config CE0 #####
 
 #frequency_0=434.250
-frequency_0=921.200
+#frequency_0=921.200
+frequency_0=433.000
 mode_0=3
 AFC_0=Y
 #bandwidth_0=125K
