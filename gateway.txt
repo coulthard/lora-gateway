@@ -60,6 +60,6 @@ AFC_1=Y
 #UplinkCycle_1=60
 
 ### Display options ###
-DisplayType=ili9163
-#DisplayType=st7735
-DisplayOrientation=180
+#DisplayType=ili9163
+DisplayType=st7735
+DisplayOrientation=90
