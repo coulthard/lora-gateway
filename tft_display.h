@@ -41,5 +41,5 @@ extern SDL_Color tft_black	;
 
 
 
-void init_tft_display();
+void init_tft_display(char* display_type, int display_orientation);
 void tft_printf(int x, int y, SDL_Color col, int sz, char* format, ...);

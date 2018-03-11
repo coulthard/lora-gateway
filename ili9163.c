@@ -17,6 +17,8 @@
 #define LED_WIRING_PIN		23
 
 int g_spi_fd = -1;
+int g_draw_x_offset = 0; // st7735 boards have an offset of 32
+int g_draw_y_offset = 0; // st7735 boards have an offset of 32
 
 static void write_command(uint8_t cmd)
 {
@@ -56,8 +58,10 @@ void reset_LCD()
 void set_frame(int x1, int y1, int x2, int y2)
 {
 	// For st7735 boards add an offset of 32 to y co-ords.
-	y1 += 32;
-	y2 += 32;
+	x1 += g_draw_x_offset;
+	x2 += g_draw_x_offset;
+	y1 += g_draw_y_offset;
+	y2 += g_draw_y_offset;
 
 	uint8_t data_xrange[4] = { x1 >> 8, x1 & 0xff, x2 >> 8, x2 & 0xff };
 	uint8_t data_yrange[4] = { y1 >> 8, y1 & 0xff, y2 >> 8, y2 & 0xff };
@@ -99,8 +103,10 @@ void set_pixel(uint16_t col, int x, int y, int sz)
 	}
 }
 
-void init_display(uint8_t orientation)
+void init_display(uint8_t orientation, int draw_x_offset, int draw_y_offset)
 {
+	g_draw_x_offset = draw_x_offset;
+	g_draw_y_offset = draw_y_offset;
 	if (g_spi_fd == -1)
 	{
 		if ( wiringPiSetup() < 0 )

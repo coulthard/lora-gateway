@@ -26,9 +26,19 @@ struct ui_state g_ui_state;
 
 
 int hline(SDL_Renderer * renderer, Sint16 x1, Sint16 x2, Sint16 y);
-void init_tft_display()
+void init_tft_display(char* display_type, int display_orientation)
 {
-    init_display(ORIENTATION180);
+    int orientation_code = ORIENTATION0;
+    int draw_offset = (strcasecmp(display_type, "st7735") == 0) ? 32 : 0;
+    int xoff = 0, yoff = 0;
+    switch(display_orientation)
+    {
+        case 0: orientation_code = ORIENTATION0; break;
+        case 90: orientation_code = ORIENTATION90; break;
+        case 180: orientation_code = ORIENTATION180; yoff = draw_offset; break;
+        case 270: orientation_code = ORIENTATION270; xoff = draw_offset; break;
+    }
+    init_display(orientation_code, xoff, yoff);
 
 	if (TTF_Init() < 0)
 	{

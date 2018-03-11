@@ -41,7 +41,10 @@
 #define NEGATIVE_GAMMA_CORRECT 0xE1
 #define GAM_R_SEL 0xF2
 
-#define ORIENTATION0	0x00#define ORIENTATION90	0x60#define ORIENTATION270	0xa0#define ORIENTATION180	0xc0
+#define ORIENTATION0	0x00
+#define ORIENTATION90	0x60
+#define ORIENTATION270	0xa0
+#define ORIENTATION180	0xc0
 
 #define TFT_WIDTH			128
 #define TFT_HEIGHT			128
@@ -49,7 +52,7 @@
 // rgb565 encoding
 #define RGB(r, g, b)	(((b & 0xF8) << 8) | ((g & 0xFC) << 3) | (r >> 3))
 
-void init_display(uint8_t orientation);
+void init_display(uint8_t orientation, int draw_x_offset, int draw_y_offset);
 void clear_display(uint16_t col);
 void set_pixel(uint16_t col, int x, int y, int sz);
 void blt_bitmap(uint8_t* bitmap);

@@ -98,6 +98,8 @@ struct TPayload
 	char antenna[64];
 	int EnableDev;
 	char UplinkCode[64];
+	char DisplayType[32];
+	int  DisplayOrientation;
 };
  typedef struct {
     int parent_status;

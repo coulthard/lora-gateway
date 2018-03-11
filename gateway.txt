@@ -58,3 +58,8 @@ AFC_1=Y
 #DIO5_1=5
 #UplinkTime_1=5
 #UplinkCycle_1=60
+
+### Display options ###
+DisplayType=ili9163
+#DisplayType=st7735
+DisplayOrientation=180

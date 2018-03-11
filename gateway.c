@@ -1585,6 +1585,10 @@ void LoadConfigFile(void)
     // Dev mode
     RegisterConfigBoolean(MainSection, -1, "EnableDev", &Config.EnableDev, NULL);
 
+    // Display options
+    RegisterConfigString(MainSection, -1, "DisplayType", Config.DisplayType, sizeof(Config.DisplayType), NULL);
+    RegisterConfigInteger(MainSection, -1, "DisplayOrientation", &Config.DisplayOrientation, NULL);
+
     // SMS upload to tracker
 	RegisterConfigString(MainSection, -1, "SMSFolder", Config.SMSFolder, sizeof(Config.SMSFolder), NULL);
     if (Config.SMSFolder[0])
@@ -2226,7 +2230,6 @@ int main( int argc, char **argv )
     curl_global_init( CURL_GLOBAL_ALL );    // RJH thread safe
 
     mainwin = InitDisplay();
-    init_tft_display();
 
     // Settings for character input
     noecho(  );
@@ -2238,6 +2241,7 @@ int main( int argc, char **argv )
     LEDCounts[1] = 0;
 
     LoadConfigFile();
+    init_tft_display(Config.DisplayType, Config.DisplayOrientation);
 
     int result;
 
