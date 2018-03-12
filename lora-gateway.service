@@ -1,0 +1,12 @@
+[Unit]
+After=network.target
+
+[Service]
+User=pi
+Type=forking
+WorkingDirectory=/home/pi/lora-gateway
+ExecStart=/usr/bin/screen -dmS lora /home/pi/lora-gateway/gateway
+
+[Install]
+WantedBy=multi-user.target
+
